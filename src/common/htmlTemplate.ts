@@ -60,9 +60,9 @@ export const otpTemplate = (otp: string, verifyLink: string = "") => {
         </head>
         <body>
             <div class="container">
-                <h1 class="logo">CTMS</h1>
+                <h1 class="logo">Why Designers</h1>
                 <h2>Verify Your Email</h2>
-                <p>Your One-Time Password (OTP) for CTMS verification is:</p>
+                <p>Your One-Time Password (OTP) for Why Designers verification is:</p>
                 <div class="otp">${otp}</div>
                 <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
                 <p class="footer">If you did not request this, please ignore this email.</p>
@@ -79,7 +79,7 @@ export const passwordTemplate = (password: string) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>CTMS Password</title>
+            <title>Why Designers Password</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;

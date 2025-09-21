@@ -109,28 +109,28 @@ export default class UserService {
     }
 
     // send email verification otp
-    // const otp = generateOtp();
+    const otp = generateOtp();
 
-    // const cacheKey = `email-otp-for-email-verification-${newUser.email}`;
+    const cacheKey = `email-otp-for-email-verification-${newUser.email}`;
 
-    // await this.cacheAdapter.set(
-    //   cacheKey,
-    //   otp,
-    //   Number(config.cache.CACHE_EXPIRE_TIME)
-    // );
+    await this.cacheAdapter.set(
+      cacheKey,
+      otp,
+      Number(config.cache.CACHE_EXPIRE_TIME)
+    );
 
-    // const result = await this.mailService.sendMail(
-    //   newUser.email,
-    //   "Welcome to CTMS | Please verify your email",
-    //   otpTemplate(otp)
-    // );
+    const result = await this.mailService.sendMail(
+      newUser.email,
+      "Welcome to Why Designers | Please verify your email",
+      otpTemplate(otp)
+    );
 
-    // if (!result) {
-    //   this.logger.error("Failed to send email verification OTP", {
-    //     email: newUser.email,
-    //   });
-    //   throw new InternalServerError("Failed to send email verification OTP");
-    // }
+    if (!result) {
+      this.logger.error("Failed to send email verification OTP", {
+        email: newUser.email,
+      });
+      throw new InternalServerError("Failed to send email verification OTP");
+    }
     return newUser;
   }
 
