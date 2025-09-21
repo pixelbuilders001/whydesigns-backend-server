@@ -1,4 +1,6 @@
 // import { IStorageAdapter } from "./type";
+// import { Cloudinary } from "cloudinary";
+// import { generateS3Path } from "../../common/s3Utils";
 
 // class CloudinaryAdapter implements IStorageAdapter {
 //   private cloudinary: Cloudinary;
@@ -10,10 +12,10 @@
 //     });
 //   }
 
-//   uploadFile(key: string, body: Buffer, contentType: string): Promise<string> {
+//   uploadFile(username: string, fileName: string, body: Buffer, contentType: string): Promise<string> {
 //     return this.cloudinary.uploader.upload_stream({
 //       resource_type: "auto",
-//       public_id: key,
+//       public_id: generateS3Path("user", username, fileName),
 //       format: "auto",
 //       secure: true,
 //     }, body);
@@ -23,4 +25,4 @@
 //   }
 // }
 
-// this is for testing adaptor factory method for storage.
+// // this is for testing adaptor factory method for storage.

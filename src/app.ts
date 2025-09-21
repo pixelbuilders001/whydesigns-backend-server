@@ -19,7 +19,15 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(cors({ origin: config.ORIGIN, credentials: true }));
+// CORS configuration
+app.use(
+  cors({
+    origin: config.ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.get("/api/health", (req: Request, res: Response) => {
   res.json({ message: `API is up and running.` });
 });
@@ -27,10 +35,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 // connect to database
 connectDB();
 
-const v1controllers = [
-  roleController,
-  userController,
-];
+const v1controllers = [roleController, userController];
 
 v1controllers.forEach((controller) => app.use("/api/v1", controller.router));
 
