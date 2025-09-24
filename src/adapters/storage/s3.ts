@@ -37,12 +37,13 @@ export class S3Adapter implements IStorageAdapter {
   }
 
   async uploadFile(
+    module: string,
     username: string,
     fileName: string,
     body: Buffer,
     contentType: string
   ): Promise<string> {
-    const key = generateS3Path("user", username, fileName);
+    const key = generateS3Path(module, username, fileName);
     const uploadParams: UploadParams = {
       Bucket: this.bucketName,
       Key: key,
@@ -58,6 +59,7 @@ export class S3Adapter implements IStorageAdapter {
         error,
         key,
         bucket: this.bucketName,
+        region: config.s3.region,
       });
       throw new Error("Failed to upload file to S3");
     }

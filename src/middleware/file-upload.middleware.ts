@@ -79,6 +79,9 @@ const storage = multer.diskStorage({
   }
 });
 
+// Configure multer to use memory storage for S3 uploads
+const memoryStorage = multer.memoryStorage();
+
 // File filter function with proper typing
 const fileFilter = (
   req: Request,
@@ -126,6 +129,13 @@ const upload = multer({
   limits,
 });
 
+// Memory storage for direct-to-S3 uploads
+const memoryUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter,
+  limits,
+});
+
 /**
  * Middleware for handling single file uploads
  * @param fieldName - Name of the form field containing the file
@@ -144,6 +154,65 @@ export const singleFileUpload = (fieldName: string) => {
           return res.status(400).json({
             success: false,
             message: "Too many files. Maximum 5 files allowed",
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          message: err.message,
+        });
+      }
+      next();
+    });
+  };
+};
+
+/**
+ * Middleware for handling single file uploads in memory (buffer)
+ * Suitable for uploading directly to S3.
+ */
+export const singleMemoryUpload = (fieldName: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    memoryUpload.single(fieldName)(req, res, (err: any) => {
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({
+            success: false,
+            message: "File too large. Maximum size allowed is 5MB",
+          });
+        }
+        if (err.code === "LIMIT_FILE_COUNT") {
+          return res.status(400).json({
+            success: false,
+            message: "Too many files. Maximum 5 files allowed",
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          message: err.message,
+        });
+      }
+      next();
+    });
+  };
+};
+
+/**
+ * Middleware for handling multiple file uploads in memory (buffers)
+ */
+export const multipleMemoryUpload = (fieldName: string, maxCount: number = 5) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    memoryUpload.array(fieldName, maxCount)(req, res, (err: any) => {
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({
+            success: false,
+            message: "File too large. Maximum size allowed is 5MB",
+          });
+        }
+        if (err.code === "LIMIT_FILE_COUNT") {
+          return res.status(400).json({
+            success: false,
+            message: `Too many files. Maximum ${maxCount} files allowed`,
           });
         }
         return res.status(400).json({

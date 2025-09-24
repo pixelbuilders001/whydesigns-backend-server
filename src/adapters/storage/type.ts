@@ -1,5 +1,6 @@
 export interface IStorageAdapter {
   uploadFile(
+    module: string,
     username: string,
     fileName: string,
     body: Buffer,
