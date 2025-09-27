@@ -28,16 +28,19 @@ import {
   UserSignInSchema,
   userUpdateSchema,
 } from "./validation";
-import { ICacheAdapter } from "../../../../adapters/cache/type";
 import { ILoggerAdapter } from "../../../../adapters/logger/LoggerAdapter";
 import { IStorageAdapter } from "../../../../adapters/storage/type";
 import { config } from "../../../../config";
+import {
+  IOtpRepository,
+  OtpPurpose,
+} from "../../otp/repository/otpRepository";
 import axios from "axios";
 
 export default class UserService {
   private userRepository: IUserRepository;
   private roleRepository: IRoleRepository;
-  private cacheAdapter: ICacheAdapter;
+  private otpRepository: IOtpRepository;
   private mailService: typeof MailService;
   private logger: ILoggerAdapter;
   private storageAdapter: IStorageAdapter;
@@ -45,13 +48,13 @@ export default class UserService {
   constructor(
     userRepository: IUserRepository,
     roleRepository: IRoleRepository,
-    cacheAdapter: ICacheAdapter,
+    otpRepository: IOtpRepository,
     mailService: typeof MailService,
     storageAdapter: IStorageAdapter
   ) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
-    this.cacheAdapter = cacheAdapter;
+    this.otpRepository = otpRepository;
     this.mailService = mailService;
     this.logger = LoggerAdapterFactory.getAdapter(
       process.env.LOG_PROVIDER || "winston"
@@ -110,13 +113,14 @@ export default class UserService {
     // send email verification otp
     const otp = generateOtp();
 
-    const cacheKey = `email-otp-for-email-verification-${newUser.email}`;
-
-    await this.cacheAdapter.set(
-      cacheKey,
+    await this.otpRepository.saveOtp({
+      userId: newUser.id,
+      purpose: OtpPurpose.EMAIL_VERIFICATION,
       otp,
-      Number(config.cache.CACHE_EXPIRE_TIME)
-    );
+      identifier: newUser.email ?? null,
+      expiresAt: new Date(Date.now() + Number(config.otp.EXPIRE_TIME)),
+      metadata: { email: newUser.email },
+    });
 
     const result = await this.mailService.sendMail(
       newUser.email,
@@ -156,14 +160,14 @@ export default class UserService {
     // generate otp
     const otp = generateOtp();
 
-    // set otp in cache
-    const key = `email-otp-for-email-verification-${user.email}`;
-
-    await this.cacheAdapter.set(
-      key,
+    await this.otpRepository.saveOtp({
+      userId: user.id,
+      purpose: OtpPurpose.EMAIL_VERIFICATION,
       otp,
-      Number(config.cache.CACHE_EXPIRE_TIME)
-    );
+      identifier: user.email ?? null,
+      expiresAt: new Date(Date.now() + Number(config.otp.EXPIRE_TIME)),
+      metadata: { email: user.email },
+    });
 
     await this.mailService.sendMail(
       user.email,
@@ -178,19 +182,21 @@ export default class UserService {
     const user = await this.getUserByFilter({ email });
     if (!user) throw new NotFoundError("User not found");
 
-    // get otp from cache
-    const key = `email-otp-for-email-verification-${user.email}`;
+    const otpRecord = await this.otpRepository.getActiveOtp(
+      user.id,
+      OtpPurpose.EMAIL_VERIFICATION,
+      user.email ?? null
+    );
 
-    const cachedOtp = await this.cacheAdapter.get(key);
-
-    if (!cachedOtp) {
+    if (!otpRecord) {
       this.logger.warn("OTP expired for user", { email });
       throw new BadRequestError("OTP has expired");
     }
 
-    if (cachedOtp !== otp) throw new UnauthorizedError("Invalid OTP");
+    if (otpRecord.otp !== otp) throw new UnauthorizedError("Invalid OTP");
 
-    await this.cacheAdapter.delete(key);
+    await this.otpRepository.markOtpConsumed(otpRecord.id);
+    await this.otpRepository.deleteOtp(user.id, OtpPurpose.EMAIL_VERIFICATION);
 
     return await this.userRepository.updateUser(user.id, {
       isEmailVerified: true,
@@ -276,9 +282,14 @@ export default class UserService {
       otpTemplate(otp)
     );
 
-    const cacheKey = `reset-password-${user.id}`;
-
-    await this.cacheAdapter.set(cacheKey, otp);
+    await this.otpRepository.saveOtp({
+      userId: user.id,
+      purpose: OtpPurpose.PASSWORD_RESET,
+      otp,
+      identifier: user.email ?? null,
+      expiresAt: new Date(Date.now() + Number(config.otp.EXPIRE_TIME)),
+      metadata: { email: user.email },
+    });
 
     return "OTP sent successfully.";
   }
@@ -288,12 +299,15 @@ export default class UserService {
     const user = await this.getUserByFilter(validatedEmail);
     if (!user) throw new NotFoundError("User not found");
 
-    const cacheKey = `reset-password-${user.id}`;
+    const otpRecord = await this.otpRepository.getActiveOtp(
+      user.id,
+      OtpPurpose.PASSWORD_RESET,
+      user.email ?? null
+    );
+    if (!otpRecord)
+      throw new NotFoundError("Password reset link has expired");
 
-    const cachedOtp = await this.cacheAdapter.get(cacheKey);
-    if (!cachedOtp) throw new NotFoundError("Password reset link has expired");
-
-    if (cachedOtp !== otp) throw new UnauthorizedError("Invalid OTP");
+    if (otpRecord.otp !== otp) throw new UnauthorizedError("Invalid OTP");
 
     return "OTP verified successfully.";
   }
@@ -303,18 +317,23 @@ export default class UserService {
     const user = await this.getUserByFilter(validatedEmail);
     if (!user) throw new NotFoundError("User not found");
 
-    const cacheKey = `reset-password-${user.id}`;
+    const otpRecord = await this.otpRepository.getActiveOtp(
+      user.id,
+      OtpPurpose.PASSWORD_RESET,
+      user.email ?? null
+    );
+    if (!otpRecord)
+      throw new NotFoundError("Password reset link has expired");
 
-    const cachedOtp = await this.cacheAdapter.get(cacheKey);
-    if (!cachedOtp) throw new NotFoundError("Password reset link has expired");
-
-    if (cachedOtp !== payload.otp) throw new UnauthorizedError("Invalid OTP");
+    if (otpRecord.otp !== payload.otp)
+      throw new UnauthorizedError("Invalid OTP");
 
     await this.userRepository.updateUser(user.id, {
       password: payload.password,
     });
 
-    await this.cacheAdapter.delete(cacheKey);
+    await this.otpRepository.markOtpConsumed(otpRecord.id);
+    await this.otpRepository.deleteOtp(user.id, OtpPurpose.PASSWORD_RESET);
 
     return "Password reset successfully";
   }
