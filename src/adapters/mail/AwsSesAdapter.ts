@@ -13,10 +13,11 @@ class AwsSesAdapter {
         secretAccessKey: config.aws.AWS_SECRET_ACCESS_KEY,
       },
     });
-    this.senderEmail = config.aws.MAIL_FROM;
+    this.senderEmail = config.mail.MAIL_FROM;
   }
 
   async sendMail(to: string, subject: string, html: string) {
+    console.log("AWS SES Adapter", to, subject, html);
     try {
       const command = new SendEmailCommand({
         Destination: {
@@ -43,7 +44,7 @@ class AwsSesAdapter {
       if (error instanceof Error) {
         throw new Error(`Failed to send email: ${error.message}`);
       }
-      throw new Error('Failed to send email');
+      throw new Error("Failed to send email");
     }
   }
 }

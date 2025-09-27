@@ -27,12 +27,14 @@ export const config = {
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET_KEY || "access_secret",
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET_KEY || "refresh_secret",
   },
-  MAIL_PROVIDER: process.env.MAIL_PROVIDER || "ses",
+  mail: {
+    MAIL_FROM: process.env.MAIL_FROM || "",
+    MAIL_PROVIDER: process.env.MAIL_PROVIDER || "ses",
+  },
   aws: {
     AWS_REGION: process.env.AWS_REGION || "us-east-1",
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
-    MAIL_FROM: process.env.MAIL_FROM || "",
   },
   nodemailer: {
     SMTP_HOST: process.env.SMTP_HOST || "localhost",

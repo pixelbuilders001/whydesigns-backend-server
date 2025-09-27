@@ -10,7 +10,7 @@ class MailService {
 
   constructor() {
     this.mailAdapter = MailAdapterFactory.getAdapter(
-      config.MAIL_PROVIDER || "ses"
+      config.mail.MAIL_PROVIDER || "ses"
     );
   }
 
