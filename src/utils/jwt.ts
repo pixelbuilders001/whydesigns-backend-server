@@ -2,10 +2,10 @@ import jwt from "jsonwebtoken";
 import { config } from "../config";
 
 interface TokenPayload {
-  userId: string;
+  userId: number;
 }
 
-export async function generateAccessToken(userId: string): Promise<string> {
+export async function generateAccessToken(userId: number): Promise<string> {
   const payload = {
     userId: userId,
   };
@@ -14,7 +14,7 @@ export async function generateAccessToken(userId: string): Promise<string> {
   return jwt.sign(payload, secretKey, { expiresIn: "1h" });
 }
 
-export async function generateRefreshToken(userId: string): Promise<string> {
+export async function generateRefreshToken(userId: number): Promise<string> {
   const payload = {
     userId: userId,
   };

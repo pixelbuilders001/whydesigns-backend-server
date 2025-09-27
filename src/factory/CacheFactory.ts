@@ -6,7 +6,7 @@ class CacheFactory {
 
   public static getCacheAdapter(): ICacheAdapter {
     if (!this.instance) {
-      this.instance = RedisCacheAdapter;
+      // this.instance = RedisCacheAdapter;
     }
     return this.instance;
   }

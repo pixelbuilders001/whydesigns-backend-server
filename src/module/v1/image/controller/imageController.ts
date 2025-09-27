@@ -38,8 +38,10 @@ export default class ImageController extends ExpressController {
   // New: Upload to S3
   uploadToS3 = async (req: Request, res: Response) => {
     const moduleName = req.params.module;
-    const userId = (req as any).userId as string | undefined;
-    if (!userId) {
+    const rawUserId = (req as any).userId as number | string | undefined;
+    const userId =
+      typeof rawUserId === "string" ? parseInt(rawUserId, 10) : rawUserId;
+    if (!userId || Number.isNaN(userId)) {
       return this.sendError(StatusCodes.UNAUTHORIZED, res, "Unauthorized");
     }
     const file = (req as any).file as Express.Multer.File | undefined;
@@ -51,7 +53,12 @@ export default class ImageController extends ExpressController {
       mimetype: file.mimetype,
       buffer: file.buffer,
     });
-    return this.sendSuccess(StatusCodes.CREATED, res, result, "Uploaded successfully");
+    return this.sendSuccess(
+      StatusCodes.CREATED,
+      res,
+      result,
+      "Uploaded successfully"
+    );
   };
 
   // New: Delete from S3 by URL
@@ -61,7 +68,12 @@ export default class ImageController extends ExpressController {
       return this.sendBadRequest(res, "fileUrl is required");
     }
     await this.imageService.deleteImageByUrl(fileUrl);
-    return this.sendSuccess(StatusCodes.OK, res, { deleted: true }, "Deleted successfully");
+    return this.sendSuccess(
+      StatusCodes.OK,
+      res,
+      { deleted: true },
+      "Deleted successfully"
+    );
   };
 }
 

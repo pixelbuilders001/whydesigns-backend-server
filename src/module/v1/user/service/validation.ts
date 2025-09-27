@@ -74,7 +74,7 @@ export const UserFilterSchema = z.object({
     .min(2, "First name must have at least 2 characters")
     .optional(),
   isActive: z.boolean().optional(),
-  roleId: z.string().uuid().optional(),
+  roleId: z.number().optional(),
 });
 
 export const ResetPasswordSchema = z.object({

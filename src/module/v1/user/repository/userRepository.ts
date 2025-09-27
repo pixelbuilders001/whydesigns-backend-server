@@ -1,5 +1,4 @@
 import { Op } from "sequelize";
-import { generateAccessToken } from "../../../../utils/jwt";
 import {
   UserFilterType,
   UserPayloadType,
@@ -10,15 +9,15 @@ import User from "../../../../../db/models/auth/user.model";
 
 export interface IUserRepository {
   createUser(user: any): Promise<UserResponse>;
-  getUserById(userId: string): Promise<any>;
+  getUserById(userId: number): Promise<UserResponse | null>;
   getAllUsers(
     limit: number,
     page: number,
     filter: UserFilterType
   ): Promise<{ rows: UserResponse[]; count: number }>;
-  updateUser(userId: string, user: any): Promise<any>;
-  getUserByFilter(filters: Partial<UserPayloadType>): Promise<any>;
-  updateRefreshToken(userId: string, refreshToken: string | null): Promise<any>;
+  updateUser(userId: number, user: any): Promise<any>;
+  getUserByFilter(filters: Partial<UserPayloadType>): Promise<UserResponse | null>;
+  updateRefreshToken(userId: number, refreshToken: string | null): Promise<any>;
   getUserByEmailOrPhone(
     emailOrPhoneNumber: UserPayloadType["email" | "phoneNumber"]
   ): Promise<any>;
@@ -29,7 +28,7 @@ export default class UserRepository implements IUserRepository {
     return await User.create(user);
   }
 
-  async getUserById(userId: string): Promise<any> {
+  async getUserById(userId: number): Promise<UserResponse | null> {
     return await User.findByPk(userId, {
       attributes: {
         exclude: ["password", "refreshToken"],
@@ -61,20 +60,14 @@ export default class UserRepository implements IUserRepository {
       nest: true,
     });
 
-    // Convert id to string to match UserResponse type
-    const formattedRows = rows.map((user) => ({
-      ...user,
-      id: user.id.toString(),
-    }));
-
-    return { rows: formattedRows, count };
+    return { rows: rows as unknown as UserResponse[], count };
   }
 
-  async getUserByFilter(filters: Partial<UserPayloadType>): Promise<any> {
+  async getUserByFilter(filters: Partial<UserPayloadType>): Promise<UserResponse | null> {
     return await User.findOne({ where: filters });
   }
 
-  async updateUser(userId: string, payload: UserUpdateType): Promise<any> {
+  async updateUser(userId: number, payload: UserUpdateType): Promise<any> {
     return await User.update(payload, {
       where: { id: userId },
       returning: true,
@@ -96,7 +89,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async updateRefreshToken(
-    userId: string,
+    userId: number,
     refreshToken: string | null
   ): Promise<any> {
     const user = await User.findByPk(userId);

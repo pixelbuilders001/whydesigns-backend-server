@@ -68,7 +68,7 @@ export default class UserController extends ExpressController {
       asyncHandler(this.resetPassword)
     );
     this.router.post(`${this.path}/google-auth`, asyncHandler(this.googleAuth));
-    
+
     // Logout endpoint
     this.router.post(
       `${this.path}/logout`,
@@ -143,27 +143,27 @@ export default class UserController extends ExpressController {
 
   logout = async (req: Request, res: Response) => {
     const userId = (req as any).userId;
-    
+
     // Clear the refresh token from the database
     await this.userService.updateRefreshToken(userId, null);
-    
+
     // Clear the access token cookie
-    res.clearCookie('accessToken', {
-      path: '/',
+    res.clearCookie("accessToken", {
+      path: "/",
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    });
-    
-    // Clear the refresh token cookie
-    res.clearCookie('refreshToken', {
-      path: '/api/v1/user/refresh-token',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     });
 
-    return this.sendSuccess(StatusCodes.OK, res, {}, 'Successfully logged out');
+    // Clear the refresh token cookie
+    res.clearCookie("refreshToken", {
+      path: "/api/v1/user/refresh-token",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return this.sendSuccess(StatusCodes.OK, res, {}, "Successfully logged out");
   };
 
   getCurrentUser = async (req: Request, res: Response) => {
@@ -180,7 +180,7 @@ export default class UserController extends ExpressController {
 
   getUserById = async (req: Request, res: Response) => {
     const userId = req.params.id;
-    const user = await this.userService.getUserById(userId);
+    const user = await this.userService.getUserById(parseInt(userId));
     return this.sendSuccess(StatusCodes.OK, res, user);
   };
 

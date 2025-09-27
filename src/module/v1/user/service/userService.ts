@@ -1,6 +1,5 @@
 import MailService from "../../../../adapters/mail/MailService";
 import { otpTemplate } from "../../../../common/htmlTemplate";
-import { isValidUUID } from "../../../../common/type";
 import { LoggerAdapterFactory } from "../../../../factory/LoggerFactory";
 import {
   AlreadyExistsError,
@@ -135,7 +134,7 @@ export default class UserService {
   }
 
   async updateUser(
-    userId: string,
+    userId: number,
     user: UserUpdateType
   ): Promise<UserResponse> {
     const validatePayload = validatePayloadSchema(userUpdateSchema, user);
@@ -241,8 +240,8 @@ export default class UserService {
     return await generateAccessToken(decoded.userId);
   }
 
-  async getUserById(userId: string) {
-    if (!isValidUUID(userId))
+  async getUserById(userId: number) {
+    if (typeof userId !== "number")
       throw new NotFoundError("Please provide valid id");
     const user = await this.userRepository.getUserById(userId);
     if (!user) throw new NotFoundError("User not found");
@@ -380,7 +379,7 @@ export default class UserService {
    * @param refreshToken - The new refresh token (or null to clear it)
    */
   async updateRefreshToken(
-    userId: string,
+    userId: number,
     refreshToken: string | null
   ): Promise<void> {
     await this.userRepository.updateRefreshToken(userId, refreshToken);

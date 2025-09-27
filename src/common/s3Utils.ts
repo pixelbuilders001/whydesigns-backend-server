@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 export const generateS3Path = (
   module: string,
   username: string,
@@ -9,8 +7,8 @@ export const generateS3Path = (
   const sanitizedUsername = username.replace(/[^a-zA-Z0-9]/g, "_");
   // Extract file extension
   const fileExtension = fileName.split(".").pop();
-  // Generate a unique identifier for the file
-  const uniqueId = uuidv4();
+  // Generate a unique identifier for the file without uuid package
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
   return `${module}/${sanitizedUsername}/${uniqueId}${
     fileExtension ? `.${fileExtension}` : ""

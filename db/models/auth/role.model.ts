@@ -34,25 +34,30 @@ Role.init(
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
+      field: "id",
     },
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
+      field: "name",
     },
     description: {
       type: DataTypes.STRING(200),
       allowNull: true,
+      field: "description",
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+      field: "createdat",
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+      field: "updatedat",
     },
   },
   {

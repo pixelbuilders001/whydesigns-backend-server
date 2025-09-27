@@ -20,5 +20,6 @@ export const userService = new UserService(
 export const roleService = new RoleService(roleRepository);
 
 // Image Service
-export const imageService = new ImageService(StorageFactory.getStorageAdapter());
-
+export const imageService = new ImageService(
+  StorageFactory.getStorageAdapter()
+);

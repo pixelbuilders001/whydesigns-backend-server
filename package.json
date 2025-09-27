@@ -26,13 +26,11 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^22.13.5",
     "@types/nodemailer": "^6.4.17",
-    "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "nodemon": "^3.1.9",
     "sequelize-cli": "^6.6.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "uuid": "^11.1.0"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.802.0",

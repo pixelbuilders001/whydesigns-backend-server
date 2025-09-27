@@ -12,7 +12,7 @@ export default class ImageService {
   // Upload a file to S3 and return its public URL and key
   async uploadImage(
     moduleName: string,
-    userId: string,
+    userId: number,
     file: { originalname: string; mimetype: string; buffer: Buffer }
   ) {
     if (!file || !file.buffer) throw new NotFoundError("File is required");

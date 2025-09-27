@@ -75,10 +75,12 @@ User.init(
     firstName: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      field: "firstname",
     },
     lastName: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      field: "lastname",
     },
     roleId: {
       type: DataTypes.INTEGER,
@@ -89,15 +91,18 @@ User.init(
       },
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT',
+      field: "roleid",
     },
     dateOfBirth: {
       type: DataTypes.DATE,
       allowNull: true,
+      field: "dateofbirth",
     },
     phoneNumber: {
       type: DataTypes.STRING(20),
       allowNull: true,
       unique: true,
+      field: "phonenumber",
     },
     email: {
       type: DataTypes.STRING(100),
@@ -110,10 +115,12 @@ User.init(
     isEmailVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      field: "isemailverified",
     },
     isPhoneVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      field: "isphoneverified",
     },
     address: {
       type: DataTypes.STRING(200),
@@ -126,14 +133,17 @@ User.init(
     profilePicture: {
       type: DataTypes.TEXT,
       allowNull: true,
+      field: "profilepicture",
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      field: "isactive",
     },
     refreshToken: {
       type: DataTypes.STRING,
       allowNull: true,
+      field: "refreshtoken",
     },
     provider: {
       type: DataTypes.ENUM("google", "facebook", "local"),
@@ -144,11 +154,13 @@ User.init(
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+      field: "createdat",
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+      field: "updatedat",
     },
   },
   {
