@@ -7,6 +7,7 @@ import { connectDB } from "../db";
 import { roleController } from "./module/v1/role/controller/roleController";
 import { userController } from "./module/v1/user/controller/userController";
 import { imageController } from "./module/v1/image/controller/imageController";
+import { counselorController } from "./module/v1/counselor/controller/counselorController";
 import { config } from "./config";
 
 dotenv.config();
@@ -36,7 +37,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 // connect to database
 connectDB();
 
-const v1controllers = [roleController, userController, imageController];
+const v1controllers = [roleController, userController, imageController, counselorController];
 
 v1controllers.forEach((controller) => app.use("/api/v1", controller.router));
 

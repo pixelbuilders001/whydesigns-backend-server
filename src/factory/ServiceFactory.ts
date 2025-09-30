@@ -6,6 +6,8 @@ import UserService from "../module/v1/user/service/userService";
 import StorageFactory from "./StorageFactory";
 import ImageService from "../module/v1/image/service/imageService";
 import { otpRepository } from "../module/v1/otp/repository/otpRepository";
+import { counselorRepository } from "../module/v1/counselor/repository/counselorRepository";
+import CounselorService from "../module/v1/counselor/service/counselorService";
 
 // User Service
 export const userService = new UserService(
@@ -23,3 +25,6 @@ export const roleService = new RoleService(roleRepository);
 export const imageService = new ImageService(
   StorageFactory.getStorageAdapter()
 );
+
+// Counselor Service
+export const counselorService = new CounselorService(counselorRepository);
