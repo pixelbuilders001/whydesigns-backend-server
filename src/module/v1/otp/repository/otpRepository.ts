@@ -1,4 +1,6 @@
-import Otp, { OtpPurpose, OtpCreationAttributes } from "../../../../../db/models/auth/otp.model";
+import Otp, { OtpPurpose } from "../../../../../db/models/auth/otp.model";
+import { Op, literal } from "sequelize";
+import { config } from "../../../../config";
 
 export { OtpPurpose } from "../../../../../db/models/auth/otp.model";
 
@@ -31,25 +33,32 @@ class OtpRepository implements IOtpRepository {
     expiresAt,
     metadata = null,
   }: SaveOtpPayload): Promise<Otp> {
-    const [record, isNew] = await Otp.findOrCreate({
+    const normalizedIdentifier = identifier
+      ? String(identifier).trim().toLowerCase()
+      : null;
+    // Compute expiry using DB time to avoid any clock skew
+    const expireSeconds = Math.floor(Number(config.otp.EXPIRE_TIME) / 1000);
+
+    // Upsert atomically based on unique (userId, purpose)
+    await Otp.upsert({
+      userId,
+      purpose,
+      otp,
+      identifier: normalizedIdentifier,
+      consumedAt: null,
+      metadata,
+      // Use DB literal for expiresAt
+      expiresAt: literal(`NOW() + INTERVAL '${expireSeconds} seconds'`) as any,
+    } as any);
+
+    // Refetch the latest record to return consistent data
+    const fresh = await Otp.findOne({
       where: { userId, purpose },
-      defaults: {
-        userId,
-        purpose,
-        otp,
-        identifier,
-        expiresAt,
-        consumedAt: null,
-        metadata,
-      } as OtpCreationAttributes,
+      order: [["updatedAt", "DESC"]],
     });
 
-    if (!isNew) {
-      record.set({ otp, identifier, expiresAt, consumedAt: null, metadata });
-      await record.save();
-    }
-
-    return record;
+    if (!fresh) throw new Error("Failed to upsert OTP");
+    return fresh;
   }
 
   async getActiveOtp(
@@ -57,19 +66,28 @@ class OtpRepository implements IOtpRepository {
     purpose: OtpPurpose,
     identifier: string | null = null
   ): Promise<Otp | null> {
+    const baseWhere: any = {
+      userId,
+      purpose,
+      consumedAt: { [Op.is]: null },
+    };
+
+    if (identifier) {
+      const normalized = String(identifier).trim().toLowerCase();
+      baseWhere.identifier = normalized;
+    }
+
     const otpRecord = await Otp.findOne({
-      where: { userId, purpose },
+      where: {
+        ...baseWhere,
+        [Op.and]: [literal('"expiresat" > NOW()')],
+      },
+      order: [["updatedAt", "DESC"]],
     });
 
     if (!otpRecord) return null;
 
-    if (identifier && otpRecord.identifier && otpRecord.identifier !== identifier) {
-      return null;
-    }
-
     if (otpRecord.consumedAt) return null;
-
-    if (otpRecord.expiresAt < new Date()) return null;
 
     return otpRecord;
   }

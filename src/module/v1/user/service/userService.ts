@@ -31,10 +31,7 @@ import {
 import { ILoggerAdapter } from "../../../../adapters/logger/LoggerAdapter";
 import { IStorageAdapter } from "../../../../adapters/storage/type";
 import { config } from "../../../../config";
-import {
-  IOtpRepository,
-  OtpPurpose,
-} from "../../otp/repository/otpRepository";
+import { IOtpRepository, OtpPurpose } from "../../otp/repository/otpRepository";
 import axios from "axios";
 
 export default class UserService {
@@ -304,8 +301,7 @@ export default class UserService {
       OtpPurpose.PASSWORD_RESET,
       user.email ?? null
     );
-    if (!otpRecord)
-      throw new NotFoundError("Password reset link has expired");
+    if (!otpRecord) throw new NotFoundError("Password reset link has expired");
 
     if (otpRecord.otp !== otp) throw new UnauthorizedError("Invalid OTP");
 
@@ -322,8 +318,7 @@ export default class UserService {
       OtpPurpose.PASSWORD_RESET,
       user.email ?? null
     );
-    if (!otpRecord)
-      throw new NotFoundError("Password reset link has expired");
+    if (!otpRecord) throw new NotFoundError("Password reset link has expired");
 
     if (otpRecord.otp !== payload.otp)
       throw new UnauthorizedError("Invalid OTP");

@@ -56,7 +56,7 @@ export const config = {
     LOG_PROVIDER: process.env.LOG_PROVIDER || "winston",
   },
   otp: {
-    EXPIRE_TIME: process.env.OTP_EXPIRE_TIME || 60 * 1000,
+    EXPIRE_TIME: process.env.OTP_EXPIRE_TIME || 60 * 5 * 1000,
     LENGTH: process.env.OTP_LENGTH || 4,
   },
 };
