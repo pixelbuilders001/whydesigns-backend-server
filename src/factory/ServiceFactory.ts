@@ -8,6 +8,8 @@ import ImageService from "../module/v1/image/service/imageService";
 import { otpRepository } from "../module/v1/otp/repository/otpRepository";
 import { counselorRepository } from "../module/v1/counselor/repository/counselorRepository";
 import CounselorService from "../module/v1/counselor/service/counselorService";
+import { bookingRepository } from "../module/v1/booking/repository/bookingRepository";
+import BookingService from "../module/v1/booking/service/bookingService";
 
 // User Service
 export const userService = new UserService(
@@ -28,3 +30,6 @@ export const imageService = new ImageService(
 
 // Counselor Service
 export const counselorService = new CounselorService(counselorRepository);
+
+// Booking Service
+export const bookingService = new BookingService(bookingRepository);
