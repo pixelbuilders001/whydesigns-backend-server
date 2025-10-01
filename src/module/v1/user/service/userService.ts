@@ -301,9 +301,16 @@ export default class UserService {
       OtpPurpose.PASSWORD_RESET,
       user.email ?? null
     );
-    if (!otpRecord) throw new NotFoundError("Password reset link has expired");
+    if (!otpRecord) throw new BadRequestError("OTP has expired");
 
     if (otpRecord.otp !== otp) throw new UnauthorizedError("Invalid OTP");
+
+    await this.userRepository.updateUser(user.id, {
+      isEmailVerified: true,
+      isActive: true,
+    });
+
+    await this.otpRepository.markOtpConsumed(otpRecord.id);
 
     return "OTP verified successfully.";
   }

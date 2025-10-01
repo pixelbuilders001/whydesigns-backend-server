@@ -234,12 +234,8 @@ export default class UserController extends ExpressController {
     const { email, otp } = req.body;
     if (!email || !otp)
       return this.sendBadRequest(res, "Please provide email and otp.");
-    await this.userService.verifyForgotPasswordOtp(email, otp);
-    return this.sendSuccess(
-      StatusCodes.OK,
-      res,
-      "Password reset successfully."
-    );
+    const message = await this.userService.verifyForgotPasswordOtp(email, otp);
+    return this.sendSuccess(StatusCodes.OK, res, message);
   };
 
   resetPassword = async (req: Request, res: Response) => {
