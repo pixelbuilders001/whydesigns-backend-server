@@ -19,6 +19,7 @@ interface UserAttributes {
   profilePicture?: string;
   isActive: boolean;
   refreshToken?: string | null;
+  provider?: "google" | "facebook" | "local";
   gender?: "male" | "female" | "other";
   createdAt?: Date;
   updatedAt?: Date;
