@@ -378,6 +378,8 @@ export default class UserService {
     if (!user.profilePicture && googleApiResData.picture) {
       await this.updateUser(user.id, {
         profilePicture: googleApiResData.picture as string,
+        isActive: true,
+        provider: "google",
       });
     }
 

@@ -49,6 +49,10 @@ export default class UserRepository implements IUserRepository {
       };
     }
 
+    if (filter?.gender) {
+      whereClause.gender = filter.gender;
+    }
+
     const { rows, count } = await User.findAndCountAll({
       limit,
       offset: (page - 1) * limit,

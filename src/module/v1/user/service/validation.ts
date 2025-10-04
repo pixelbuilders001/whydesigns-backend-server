@@ -29,6 +29,7 @@ export const userSchema = z.object({
   isActive: z.boolean().default(false),
   isEmailVerified: z.boolean().default(false).optional(),
   provider: z.enum(["google", "facebook", "local"]).optional().default("local"),
+  gender: z.enum(["male", "female", "other"]).optional(),
 });
 
 export const userUpdateSchema = z.object({
@@ -46,6 +47,10 @@ export const userUpdateSchema = z.object({
     .max(200, "Address cannot exceed 200 characters")
     .optional(),
   profilePicture: z.string().url("Invalid profile picture URL").optional(),
+  isActive: z.boolean().default(false),
+  isEmailVerified: z.boolean().default(false).optional(),
+  provider: z.enum(["google", "facebook", "local"]).optional().default("local"),
+  gender: z.enum(["male", "female", "other"]).optional(),
 });
 
 export const UserSignInSchema = z.object({
@@ -75,6 +80,7 @@ export const UserFilterSchema = z.object({
     .optional(),
   isActive: z.boolean().optional(),
   roleId: z.number().optional(),
+  gender: z.enum(["male", "female", "other"]).optional(),
 });
 
 export const ResetPasswordSchema = z.object({

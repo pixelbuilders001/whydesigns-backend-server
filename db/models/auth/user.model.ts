@@ -19,7 +19,7 @@ interface UserAttributes {
   profilePicture?: string;
   isActive: boolean;
   refreshToken?: string | null;
-  provider?: "google" | "facebook" | "local";
+  gender?: "male" | "female" | "other";
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -48,7 +48,7 @@ class User
   public isActive!: boolean;
   public refreshToken!: string | null;
   public provider!: "google" | "facebook" | "local";
-  public readonly createdAt!: Date;
+  public gender!: "male" | "female" | "other";
   public readonly updatedAt!: Date;
 
   toJSON() {
@@ -149,6 +149,11 @@ User.init(
       type: DataTypes.ENUM("google", "facebook", "local"),
       defaultValue: "local",
       allowNull: true,
+    },
+    gender: {
+      type: DataTypes.ENUM("male", "female", "other"),
+      allowNull: true,
+      field: "gender",
     },
     createdAt: {
       type: DataTypes.DATE,

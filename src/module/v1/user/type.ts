@@ -10,6 +10,7 @@ export type UserResponse = {
   profilePicture?: string;
   biography?: string;
   isActive: boolean;
+  gender?: "male" | "female" | "other";
   refreshToken?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
